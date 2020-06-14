@@ -14,5 +14,6 @@ Instructions:
 12. Run command `kubectl get nodes --watch` and when all your nodes reach `Ready` status you can terminate command with `Ctrl+C`
 13. Run command `kubectl apply -k .\` for wordpress deployment
 14. Run command `kubectl get pods --watch` and when all you pods reach `Running` status you can terminate command with `Ctrl+C`
-15. Run command `kubectl get services wordpress` and you will see the external ip so copy and paste into your browser
-16. Voila! You are ready to set wordpress.
+15. Wait for 5 minutes in order for the DNS record to be updated and instances to be up and running.
+16. Run command `kubectl get services wordpress` and you will see the external ip so copy and paste into your browser
+17. Voila! You are ready to set wordpress.
