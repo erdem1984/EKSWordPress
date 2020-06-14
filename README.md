@@ -12,7 +12,7 @@ Instructions:
 10. Check if the nodes are active using the command `kubectl get nodes`
 11. Replace only `<ARN of instance role (not instance profile)>` with the proper ARN and run `kubectl apply -f aws-auth-cm.yaml`
 12. Run command `kubectl get nodes --watch` and when all your nodes reach `Ready` status you can terminate command with `Ctrl+C`
-13. Run command `kubectl appply -k .\` for wordpress deployment
+13. Run command `kubectl apply -k .\` for wordpress deployment
 14. Run command `kubectl get pods --watch` and when all you pods reach `Running` status you can terminate command with `Ctrl+C`
 15. Run command `kubectl get services wordpress` and you will see the external ip so copy and paste into your browser
 16. Voila! You are ready to set wordpress.
