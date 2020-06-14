@@ -11,4 +11,4 @@ Instructions:
 9. Create a stack using NodeGroup.yaml
 10. Check if the nodes are active using the command `kubectl get nodes`
 11. Replace only `<ARN of instance role (not instance profile)>` with the proper ARN and run `kubectl apply -f aws-auth-cm.yaml`
-12. Run command `kubectl get nodes --watch` and when your nodes reach `Ready` status you can terminate command with `Ctrl+C`
+12. Run command `kubectl get nodes --watch` and when all your nodes reach `Ready` status you can terminate command with `Ctrl+C`
