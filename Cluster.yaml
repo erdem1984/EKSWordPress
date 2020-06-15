@@ -1,0 +1,41 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Amazon EKS Cluster Role'
+
+Parameters:
+
+  RoleVPCStackName:
+    Type: String
+    Description: Name of the Role VPC Stack previously created
+
+  ClusterName:
+    Type: String
+    Description: Enter a unique name for this cluster
+
+  SecurityIds:
+    Type: List<AWS::EC2::SecurityGroup::Id>
+    Description: Choose the security groups to apply to the EKS-managed Elastic Network Interfaces that are created in your worker node subnets.
+
+  Subnets:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: Choose the subnets in your VPC where your worker nodes will run.
+
+  KubernetesVersion:
+    Type: String
+    AllowedValues: [ "1.16", "1.15", "1.14", "1.13" ]
+    Default: 1.16
+    Description: Select the Kubernetes version for this cluster
+
+Resources:
+
+  Cluster:
+    Type: AWS::EKS::Cluster
+    Properties: 
+      Name: !Ref ClusterName
+      ResourcesVpcConfig: 
+        SecurityGroupIds: !Ref SecurityIds
+        SubnetIds: !Ref Subnets
+      RoleArn: 
+        Fn::ImportValue:
+          !Sub "${RoleVPCStackName}-RoleArn"
+      Version: !Ref KubernetesVersion
