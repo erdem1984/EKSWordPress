@@ -36,8 +36,11 @@ ip-192-168-250-87.eu-west-1.compute.internal    Ready      <none>   20s   v1.16.
 ip-192-168-250-87.eu-west-1.compute.internal    Ready      <none>   20s   v1.16.8-eks-e16311
 ```
 and when all your nodes reach `Ready` status you can terminate command with `Ctrl+C`
+
+15. Create a stack using RDS.yaml
+16. After the stack creation is complete,copy   value under CloudFormation Outputs and replace with <> in wordpress-deployment.yaml
 15. Run command `kubectl apply -k .\` for wordpress deployment
 16. Run command `kubectl get pods --watch` and when all you pods reach `Running` status you can terminate command with `Ctrl+C`
-17. Wait for 5 minutes in order for the DNS record to be updated and instances to be up and running.
+17. Wait for some minutes (at least 5) in order for the DNS record to be updated and instances to be up and running.
 18. Run command `kubectl get services wordpress` and you will see the external ip so copy and paste into your browser
 19. Voila! You are ready to set wordpress.
