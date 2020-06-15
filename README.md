@@ -5,7 +5,7 @@
 3. Create an Access Key through IAM for awscli usage.
 4. Install awscli
 5. Configure awscli using AccessKeyID and Secret Access Key using `aws configure`
-6. Install kubectl
+6. Install kubectl and download aws-auth-cm.yaml, kustomization.yaml and wordpress-deployment.yaml in the same directory with kubectl.exe
 7. Create a stack using RoleVPC.yaml and copy the stack name for usage in the next template.
 8. Create a stack using Cluster.yaml by selecting ControlPlaneSecurityGroup as SecurityIds and Subnet01,Subnet02,Subnet03 for Subnets and copy the cluster name for usage in the next template.
 9. After the stack creation is complete, run command with replacing <cluster_name> with you cluster name and <region_code> with your region code i.e. eu-west-1  
