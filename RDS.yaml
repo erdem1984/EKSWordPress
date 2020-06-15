@@ -1,0 +1,65 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Amazon RDS Instance
+
+Parameters:
+
+  AllocatedStorage:
+    Type: String
+    Default: 20
+    Description: "(Minimum: 20 GiB if gp2 100 GiB if io1, Maximum: 65536 GiB) Higher allocated storage may improve IOPS performance."
+
+  DBName:
+    Type: String
+    Description: Name of the DB Instance.
+
+  MasterUserPassword:
+    Type: String
+    NoEcho: true
+
+  StorageType:
+    Type: String
+    Default: gp2
+    AllowedValues:
+      - gp2
+      - io1
+
+  VPCId:
+    Type: String
+    Description: VPC Id of RoleVPC Stack
+
+  VPCSecurityGroups:
+    Type: List<AWS::EC2::SecurityGroup::Id>
+    Description: Security Group Id of NodeGroup
+
+Resources:
+
+  DBSecurityGroup:
+    Type: AWS::RDS::DBSecurityGroup
+    Properties: 
+      EC2VpcId: !Ref VPCId
+      GroupDescription: DB Security Group
+
+  RDSInstance:
+    Type: AWS::RDS::DBInstance
+    Properties: 
+      AllocatedStorage: !Ref AllocatedStorage
+      AllowMajorVersionUpgrade: false
+      AutoMinorVersionUpgrade: false
+      DBInstanceClass: db.m5.large
+      DBInstanceIdentifier: !Ref DBName
+      Engine: mysql
+      EngineVersion: "5.6.46"
+      MasterUsername: admin
+      MasterUserPassword: !Ref MasterUserPassword
+      MaxAllocatedStorage: 1000
+      MultiAZ: true
+      Port: 3306
+      PubliclyAccessible: false
+      StorageEncrypted: true
+      StorageType: !Ref StorageType
+      VPCSecurityGroups: !Ref VPCSecurityGroups
+
+Outputs:
+  Endpoint: 
+    Description: "Endpoint of the newly created RDS Instance"
+    Value: !GetAtt RDSInstance.Endpoint.Address
