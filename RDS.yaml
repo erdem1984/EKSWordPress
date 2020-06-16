@@ -1,65 +1,62 @@
-AWSTemplateFormatVersion: "2010-09-09"
-Description: Amazon RDS Instance
+AWSTemplateFormatVersion: '2010-09-09'
 
 Parameters:
 
-  AllocatedStorage:
-    Type: String
-    Default: 20
-    Description: "(Minimum: 20 GiB if gp2 100 GiB if io1, Maximum: 65536 GiB) Higher allocated storage may improve IOPS performance."
-
-  DBName:
+  DBInstanceIdentifier:
     Type: String
     Description: Name of the DB Instance.
 
-  MasterUserPassword:
+  DBPassword:
+    NoEcho: 'true'
+    Description: The database admin account password
     Type: String
-    NoEcho: true
 
-  StorageType:
-    Type: String
-    Default: gp2
-    AllowedValues:
-      - gp2
-      - io1
-
-  VPCId:
-    Type: String
-    Description: VPC Id of RoleVPC Stack
-
-  VPCSecurityGroups:
-    Type: List<AWS::EC2::SecurityGroup::Id>
-    Description: Security Group Id of NodeGroup
+Conditions:
+  
+  Is-EC2-VPC: !Or [!Equals [!Ref 'AWS::Region', eu-central-1], !Equals [!Ref 'AWS::Region',
+      cn-north-1]]
+  Is-EC2-Classic: !Not [{Condition: Is-EC2-VPC}]
 
 Resources:
 
+  DBEC2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Condition: Is-EC2-VPC
+    Properties:
+      GroupDescription: Open database for access
+      SecurityGroupIngress:
+      - CidrIp: 0.0.0.0/0
+        IpProtocol: tcp
+        FromPort: '3306'
+        ToPort: '3306'
+        
   DBSecurityGroup:
     Type: AWS::RDS::DBSecurityGroup
-    Properties: 
-      EC2VpcId: !Ref VPCId
-      GroupDescription: DB Security Group
+    Condition: Is-EC2-Classic
+    Properties:
+      DBSecurityGroupIngress:
+        CIDRIP: 0.0.0.0/0
+        
+      GroupDescription: database access
 
-  RDSInstance:
+  MasterDB:
     Type: AWS::RDS::DBInstance
-    Properties: 
-      AllocatedStorage: !Ref AllocatedStorage
-      AllowMajorVersionUpgrade: false
-      AutoMinorVersionUpgrade: false
-      DBInstanceClass: db.m5.large
-      DBInstanceIdentifier: !Ref DBName
-      Engine: mysql
-      EngineVersion: "5.6.46"
+    Properties:
+      AllocatedStorage: 20
+      DBInstanceClass: db.t3.small
+      DBInstanceIdentifier: !Ref 'DBInstanceIdentifier'
+      Engine: MySQL
+      EngineVersion: 5.6.46
       MasterUsername: admin
-      MasterUserPassword: !Ref MasterUserPassword
-      MaxAllocatedStorage: 1000
-      MultiAZ: true
-      Port: 3306
+      MasterUserPassword: !Ref 'DBPassword'
+      MultiAZ: false
       PubliclyAccessible: false
-      StorageEncrypted: true
-      StorageType: !Ref StorageType
-      VPCSecurityGroups: !Ref VPCSecurityGroups
+      VPCSecurityGroups: !If [Is-EC2-VPC, [!GetAtt [DBEC2SecurityGroup, GroupId]],
+        !Ref 'AWS::NoValue']
+      DBSecurityGroups: !If [Is-EC2-Classic, [!Ref 'DBSecurityGroup'], !Ref 'AWS::NoValue']
+    DeletionPolicy: Snapshot
 
 Outputs:
-  Endpoint: 
-    Description: "Endpoint of the newly created RDS Instance"
-    Value: !GetAtt RDSInstance.Endpoint.Address
+  EndpointAddress:
+    Description: Endpoint Address of the RDS Instance
+    Value: !GetAtt MasterDB.Endpoint.Address
