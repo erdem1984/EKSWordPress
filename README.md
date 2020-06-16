@@ -17,7 +17,7 @@ NAME         TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
 kubernetes   ClusterIP   10.100.0.1   <none>        443/TCP   9m1s
 ```
 11. Create a key pair in AWS Management Console or AWSCLI for SSH Access for the Worker Node Group that you will create in the next step
-12. Create a stack using NodeGroup.yaml by selecting ControlPlaneSecurityGroup as ClusterControlPlaneSecurityGroup, SSH Key Pair as KeyName, RoleVPC stack's VPC as VpcId and all the subnets. Don't forget to change kubernetes version to cluster's version in NodeImageIdSSMParam
+12. Create a stack using NodeGroup.yaml by selecting ControlPlaneSecurityGroup as ClusterControlPlaneSecurityGroup, SSH Key Pair as KeyName, RoleVPC stack's VPC as VpcId and all the subnets. Don't forget to change kubernetes version to cluster's version in NodeImageIdSSMParam. Copy NodeSecurityGroupName value under CloudFormation Outputs for usage in the next template
 13. After the stack creation is complete,copy NodeInstanceRole value under CloudFormation Outputs and replace with <ARN of instance role (not instance profile)> inside aws-auth-cm.yaml and run  
 `kubectl apply -f aws-auth-cm.yaml`
 14. Check if the nodes are active using  
@@ -37,8 +37,8 @@ ip-192-168-250-87.eu-west-1.compute.internal    Ready      <none>   20s   v1.16.
 ```
 and when all your nodes reach `Ready` status you can terminate command with `Ctrl+C`
 
-15. Create a stack using RDS.yaml
-16. After the stack creation is complete,copy   value under CloudFormation Outputs and replace with <db_host> in wordpress-deployment.yaml
+15. Create a stack using RDS.yaml with the value of the NodeSecurityGroupName from EC2 Security Groups as EC2SecurityGroup.
+16. After the stack creation is complete,copy EndpointAddress value under CloudFormation Outputs and replace with <db_host> in wordpress-deployment.yaml and replace <password> in kustomization.yaml with your RDS password you set in previous stack.
 15. Run command `kubectl apply -k .\` for wordpress deployment
 16. Run command `kubectl get pods --watch` and when all you pods reach `Running` status you can terminate command with `Ctrl+C`
 17. Wait for some minutes (at least 5) in order for the DNS record to be updated and instances to be up and running.
